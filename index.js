@@ -5,23 +5,6 @@ const bot = new Bot(process.env.BOT_API_KEY)
 //отслеживание состояния пользователя - когда пользователь выбирает "Заказы с POIZON", состояние waitingForPrice устанавливается в true
 bot.use(session({ initial: () => ({ waitingForPrice: false }) }));
 
-const sendStartCommand = async () => {
-    try {
-        // Получаем информацию о боте
-        const botInfo = await bot.api.getMe();
-        const botUsername = botInfo.username;
-
-        // Отправляем команду /start от имени бота
-        await bot.api.sendMessage(botInfo.id, '/start');
-        console.log('Команда /start отправлена автоматически.');
-    } catch (error) {
-        console.error('Ошибка при отправке команды /start:', error);
-    }
-};
-
-// Вызываем функцию при запуске бота
-sendStartCommand();
-
 //сообщения бота при запуске команд из меню
 bot.command('start', async (ctx) => {
     await ctx.reply(
@@ -93,4 +76,8 @@ bot.api.setMyCommands([
     }
 })
 
-    bot.start()
+const PORT = process.env.PORT || 3000
+bot.start();
+app.listen(PORT, () => {
+    console.log(`Бот запущен на порту ${PORT}`);
+});
