@@ -74,10 +74,5 @@ bot.api.setMyCommands([
     } else {
         console.error("Unknown error:", e)
     }
-})
-
-const PORT = process.env.PORT || 3000
-bot.start();
-app.listen(PORT, () => {
-    console.log(`Бот запущен на порту ${PORT}`);
 });
+bot.start();
