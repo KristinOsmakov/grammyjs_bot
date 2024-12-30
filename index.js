@@ -68,7 +68,7 @@ bot.on('message:text', async (ctx) => {
                 case price > 1000:
                     return result = (price / 6.7) * 1.05;
             }
-            await ctx.reply(`Примерная стоимость товара в USD: ${result.toFixed(2)}`);
+            await ctx.reply(`Ориентировочная стоимость товара c учетом доставки в USD: ${result.toFixed(2)}`);
         } else {
             await ctx.reply('Пожалуйста, введите стоимость в юанях (¥) (числовое значение)');
         }
