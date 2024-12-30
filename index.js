@@ -73,8 +73,8 @@ bot.on('message:text', async (ctx) => {
             await ctx.reply('Пожалуйста, введите стоимость в юанях (¥) (числовое значение)');
         }
 
-        // Сбрасываем состояние ожидания в любом случае
-        ctx.session.waitingForPrice = false;
+        // // Сбрасываем состояние ожидания в любом случае
+        // ctx.session.waitingForPrice = false;
     }
 });
 
