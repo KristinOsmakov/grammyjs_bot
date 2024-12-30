@@ -60,13 +60,13 @@ bot.on('message:text', async (ctx) => {
         const price = parseFloat(ctx.message.text);
 
         if (!isNaN(price)) {
-            let result;
-            if (price < 100) {
-                result = price / 6.7 + 10;
-            } else if (price > 100 && price < 1000) {
-                result = (price / 6.7) * 1.1;
-            } else if (price >= 1000) {
-                result = (price / 6.7) * 1.05;
+            let result = price / 6.7;
+            if (result < 100) {
+                result = result + 10;
+            } else if (result > 100 && result < 1000) {
+                result = result * 1.1;
+            } else if (result >= 1000) {
+                result = result * 1.05;
             }
             await ctx.reply(`Ориентировочная стоимость товара c учетом доставки в USD: ${result.toFixed(2)}`);
         } else {
