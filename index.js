@@ -4,6 +4,47 @@ const express = require('express'); // Добавляем express
 
 const bot = new Bot(process.env.BOT_API_KEY);
 
+//Функция для генерации таблицы 
+function generateHtmlTable(inputs) {
+    return `
+  <b>Таблица:</b>
+  <table>
+    <tr>
+      <td>Марка</td>
+      <td>${inputs[0]}</td>
+    </tr>
+    <tr>
+      <td>Модель</td>
+      <td>${inputs[1]}</td>
+    </tr>
+    <tr>
+      <td>Год выпуска</td>
+      <td>${inputs[2]}</td>
+    </tr>
+    <tr>
+      <td>VIN - номер</td>
+      <td>${inputs[3]}</td>
+    </tr>
+    <tr>
+      <td>Необходимая запчасть</td>
+      <td>${inputs[4]}</td>
+    </tr>
+    <tr>
+      <td>Фотография запчасти</td>
+      <td>${inputs[5]}</td>
+    </tr>
+    <tr>
+      <td>Примечание</td>
+      <td>${inputs[6]}</td>
+    </tr>
+  </table>
+    `;
+  }
+
+  // Генерируем таблицу
+  const table = generateTable(inputs);
+
+
 // Отслеживание состояния пользователя
 bot.use(session({ initial: () => ({ waitingForPrice: false }) }));
 
@@ -46,7 +87,9 @@ bot.hears('Автозапчасти Дубай', async (ctx) => {
 });
 
 bot.hears('Автозапчасти Китай', async (ctx) => {
-    await ctx.reply('Вот контакт нашего менеджера по приобретению и доставке автозапчастей из Китая.');
+    await ctx.reply('Заполните таблицу и мы с Вами свяжемся.');
+    await ctx.reply(table);
+    
 });
 
 bot.hears('Заказы с POIZON', async (ctx) => {
@@ -60,7 +103,7 @@ bot.on('message:text', async (ctx) => {
         const price = parseFloat(ctx.message.text);
 
         if (!isNaN(price)) {
-            let result = price / 6.7;
+            let result = price / 7;
             if (result < 100) {
                 result = result + 10;
             } else if (result > 100 && result < 1000) {
