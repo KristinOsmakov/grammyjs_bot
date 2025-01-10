@@ -4,47 +4,6 @@ const express = require('express'); // Добавляем express
 
 const bot = new Bot(process.env.BOT_API_KEY);
 
-// //Функция для генерации таблицы 
-// function generateTable(inputs) {
-//     return `
-//   <b>Таблица:</b>
-//   <table>
-//     <tr>
-//       <td>Марка</td>
-//       <td>${inputs[0]}</td>
-//     </tr>
-//     <tr>
-//       <td>Модель</td>
-//       <td>${inputs[1]}</td>
-//     </tr>
-//     <tr>
-//       <td>Год выпуска</td>
-//       <td>${inputs[2]}</td>
-//     </tr>
-//     <tr>
-//       <td>VIN - номер</td>
-//       <td>${inputs[3]}</td>
-//     </tr>
-//     <tr>
-//       <td>Необходимая запчасть</td>
-//       <td>${inputs[4]}</td>
-//     </tr>
-//     <tr>
-//       <td>Фотография запчасти</td>
-//       <td>${inputs[5]}</td>
-//     </tr>
-//     <tr>
-//       <td>Примечание</td>
-//       <td>${inputs[6]}</td>
-//     </tr>
-//   </table>
-//     `;
-//   }
-
-//   // Генерируем таблицу
-//   const table = generateTable(inputs);
-
-
 // Отслеживание состояния пользователя
 bot.use(session({ initial: () => ({ waitingForPrice: false }) }));
 
@@ -85,50 +44,60 @@ bot.api.setMyCommands([
 bot.hears('Автозапчасти Дубай', async (ctx) => {
     await ctx.reply('Вот контакт нашего менеджера по приобретению и доставке автозапчастей из Дубая.');
 });
-
+//
 bot.hears('Автозапчасти Китай', async (ctx) => {
-    await ctx.reply('Заполните таблицу и мы с Вами свяжемся.');
-    
-    // Запрашиваем данные у пользователя
-    await ctx.reply('Введите марку автомобиля:');
-    const brand = await ctx.waitFor('message:text');
-    
-    await ctx.reply('Введите модель автомобиля:');
-    const model = await ctx.waitFor('message:text');
-    
-    await ctx.reply('Введите год выпуска:');
-    const year = await ctx.waitFor('message:text');
-    
-    await ctx.reply('Введите VIN-номер:');
-    const vin = await ctx.waitFor('message:text');
-    
-    await ctx.reply('Введите необходимую запчасть:');
-    const part = await ctx.waitFor('message:text');
-    
-    await ctx.reply('Отправьте фотографию запчасти:');
-    const photo = await ctx.waitFor(':photo');
-    
-    await ctx.reply('Введите примечание:');
-    const note = await ctx.waitFor('message:text');
-    
-    // Собираем данные в массив
-    const inputs = [
-      brand.message.text,
-      model.message.text,
-      year.message.text,
-      vin.message.text,
-      part.message.text,
-      photo.message.photo[0].file_id, // Сохраняем ID фотографии
-      note.message.text
-    ];
-    
+    await ctx.reply(
+      'Заполните таблицу. Введите данные через запятую в следующем порядке:\n' +
+      'Марка, Модель, Год выпуска, VIN-номер, Необходимая запчасть, Примечание\n' +
+      'Пример: Mazda, CX-5, 2018, ABC123456789, Тормозные колодки, Нужны оригинальные запчасти'
+    );
+  
+    // Ожидаем ввод данных
+    const { message } = await ctx.waitFor('message:text');
+  
+    // Разбиваем введенные данные по запятым
+    const inputs = message.text.split(',').map((item) => item.trim());
+  
+    // Проверяем, что введено достаточно данных
+    if (inputs.length < 6) {
+      await ctx.reply('Вы ввели недостаточно данных. Пожалуйста, попробуйте снова.');
+      return;
+    }
+  
+    // Добавляем заглушку для фотографии (так как её нельзя ввести текстом)
+    inputs.push('Фотография запчасти (отправьте отдельно)');
+  
     // Генерируем таблицу
     const table = generateHtmlTable(inputs);
-    
+  
     // Отправляем таблицу
     await ctx.reply(table, { parse_mode: "HTML" });
+  
+    // Просим отправить фотографию
+    await ctx.reply('Теперь отправьте фотографию запчасти:');
+    const photo = await ctx.waitFor(':photo');
+  
+    // Обновляем данные с ID фотографии
+    inputs[5] = photo.message.photo[0].file_id;
+  
+    // Отправляем обновленную таблицу
+    const updatedTable = generateHtmlTable(inputs);
+    await ctx.reply(updatedTable, { parse_mode: "HTML" });
+  
+    // Сохраняем данные в массив (в дальнейшем можно отправить в CRM)
+    const data = {
+      brand: inputs[0],
+      model: inputs[1],
+      year: inputs[2],
+      vin: inputs[3],
+      part: inputs[4],
+      photo: inputs[5],
+      note: inputs[6]
+    };
+  
+    console.log('Данные для CRM:', data);
   });
-
+//
 bot.hears('Заказы с POIZON', async (ctx) => {
     ctx.session.waitingForPrice = true;
     await ctx.reply('Укажите стоимость товара в юанях (¥), чтобы я рассчитал примерную стоимость в USD.');
