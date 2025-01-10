@@ -4,45 +4,45 @@ const express = require('express'); // Добавляем express
 
 const bot = new Bot(process.env.BOT_API_KEY);
 
-//Функция для генерации таблицы 
-function generateHtmlTable(inputs) {
-    return `
-  <b>Таблица:</b>
-  <table>
-    <tr>
-      <td>Марка</td>
-      <td>${inputs[0]}</td>
-    </tr>
-    <tr>
-      <td>Модель</td>
-      <td>${inputs[1]}</td>
-    </tr>
-    <tr>
-      <td>Год выпуска</td>
-      <td>${inputs[2]}</td>
-    </tr>
-    <tr>
-      <td>VIN - номер</td>
-      <td>${inputs[3]}</td>
-    </tr>
-    <tr>
-      <td>Необходимая запчасть</td>
-      <td>${inputs[4]}</td>
-    </tr>
-    <tr>
-      <td>Фотография запчасти</td>
-      <td>${inputs[5]}</td>
-    </tr>
-    <tr>
-      <td>Примечание</td>
-      <td>${inputs[6]}</td>
-    </tr>
-  </table>
-    `;
-  }
+// //Функция для генерации таблицы 
+// function generateTable(inputs) {
+//     return `
+//   <b>Таблица:</b>
+//   <table>
+//     <tr>
+//       <td>Марка</td>
+//       <td>${inputs[0]}</td>
+//     </tr>
+//     <tr>
+//       <td>Модель</td>
+//       <td>${inputs[1]}</td>
+//     </tr>
+//     <tr>
+//       <td>Год выпуска</td>
+//       <td>${inputs[2]}</td>
+//     </tr>
+//     <tr>
+//       <td>VIN - номер</td>
+//       <td>${inputs[3]}</td>
+//     </tr>
+//     <tr>
+//       <td>Необходимая запчасть</td>
+//       <td>${inputs[4]}</td>
+//     </tr>
+//     <tr>
+//       <td>Фотография запчасти</td>
+//       <td>${inputs[5]}</td>
+//     </tr>
+//     <tr>
+//       <td>Примечание</td>
+//       <td>${inputs[6]}</td>
+//     </tr>
+//   </table>
+//     `;
+//   }
 
-  // Генерируем таблицу
-  const table = generateTable(inputs);
+//   // Генерируем таблицу
+//   const table = generateTable(inputs);
 
 
 // Отслеживание состояния пользователя
@@ -88,9 +88,46 @@ bot.hears('Автозапчасти Дубай', async (ctx) => {
 
 bot.hears('Автозапчасти Китай', async (ctx) => {
     await ctx.reply('Заполните таблицу и мы с Вами свяжемся.');
-    await ctx.reply(table);
     
-});
+    // Запрашиваем данные у пользователя
+    await ctx.reply('Введите марку автомобиля:');
+    const brand = await ctx.waitFor('message:text');
+    
+    await ctx.reply('Введите модель автомобиля:');
+    const model = await ctx.waitFor('message:text');
+    
+    await ctx.reply('Введите год выпуска:');
+    const year = await ctx.waitFor('message:text');
+    
+    await ctx.reply('Введите VIN-номер:');
+    const vin = await ctx.waitFor('message:text');
+    
+    await ctx.reply('Введите необходимую запчасть:');
+    const part = await ctx.waitFor('message:text');
+    
+    await ctx.reply('Отправьте фотографию запчасти:');
+    const photo = await ctx.waitFor(':photo');
+    
+    await ctx.reply('Введите примечание:');
+    const note = await ctx.waitFor('message:text');
+    
+    // Собираем данные в массив
+    const inputs = [
+      brand.message.text,
+      model.message.text,
+      year.message.text,
+      vin.message.text,
+      part.message.text,
+      photo.message.photo[0].file_id, // Сохраняем ID фотографии
+      note.message.text
+    ];
+    
+    // Генерируем таблицу
+    const table = generateHtmlTable(inputs);
+    
+    // Отправляем таблицу
+    await ctx.reply(table, { parse_mode: "HTML" });
+  });
 
 bot.hears('Заказы с POIZON', async (ctx) => {
     ctx.session.waitingForPrice = true;
