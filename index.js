@@ -60,9 +60,22 @@ bot.hears('Автозапчасти Китай', async (ctx) => {
         'Пример ввода:  Mazda; CX-5; 2018; ABC123456789; Крашка багажника, капот, крыло переднее правое; Нужны оригинальные запчасти. \n' );
 });
 
-bot.on('message:text', async (ctx) => {
+    ctx.session.waitingForCarData = true;
 
-})
+bot.on('message:text', async (ctx) => {
+    if (ctx.session.waitingForCarData) {
+        // Получаем введенные данные
+        const userInput = ctx.message.text;
+
+        // Отправляем сообщение с принятыми данными
+        await ctx.reply(`Данные приняты:\n${userInput}`);
+
+        // Сбрасываем флаг ожидания
+        ctx.session.waitingForCarData = false;
+    }
+});
+
+bot.launch();
 
 bot.hears('Заказы с POIZON', async (ctx) => {
     ctx.session.waitingForPrice = true;
