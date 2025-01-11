@@ -113,7 +113,7 @@ bot.on('message:text', async (ctx) => {
                 await ctx.reply('К сожалению, мы не подбираем запчасти для автомобилей старше 2016 года выпуска.');
                 return;
             }
-            if (vin.length !== 17) {
+            if (vin.length < 17) {
                 await ctx.reply('VIN - номер должен содержать 17 символов. Пожалуйста, исправьте данные.');
                 return;
             }
