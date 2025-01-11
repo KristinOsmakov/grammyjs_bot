@@ -4,39 +4,6 @@ const express = require('express'); // Добавляем express
 
 const bot = new Bot(process.env.BOT_API_KEY);
 
-//Функция для генерации таблицы 
-function generateTable(inputs) {
-    return `
-  <b>Таблица:</b>
-  <table>
-    <tr>
-      <td>Марка</td>
-      <td>${inputs[0]}</td>
-    </tr>
-    <tr>
-      <td>Модель</td>
-      <td>${inputs[1]}</td>
-    </tr>
-    <tr>
-      <td>Год выпуска</td>
-      <td>${inputs[2]}</td>
-    </tr>
-    <tr>
-      <td>VIN - номер</td>
-      <td>${inputs[3]}</td>
-    </tr>
-    <tr>
-      <td>Необходимая запчасть</td>
-      <td>${inputs[4]}</td>
-    </tr>
-    <tr>
-      <td>Примечание</td>
-      <td>${inputs[5]}</td>
-    </tr>
-  </table>
-    `;
-  }
-
 // Отслеживание состояния пользователя
 bot.use(session({ initial: () => ({ waitingForPrice: false }) }));
 
@@ -77,49 +44,11 @@ bot.api.setMyCommands([
 bot.hears('Автозапчасти Дубай', async (ctx) => {
     await ctx.reply('Вот контакт нашего менеджера по приобретению и доставке автозапчастей из Дубая.');
 });
-//
-bot.hears('Автозапчасти Китай', async (ctx) => {
-    await ctx.reply(
-      'Заполните таблицу. Введите данные через точку с запятой (";") в следующем порядке:\n' +
-      'Марка; Модель; Год выпуска; VIN-номер; Необходимая запчасть; Примечание\n' +
-      'Пример: Mazda; CX-5; 2018; ABC123456789; Крашка багажника, капот, крыло переднее правое; Нужны оригинальные запчасти'
-    );
-  
-    // Ожидаем ввод данных
-    const { message } = await ctx.waitFor('message:text');
-  
-    // Разбиваем введенные данные по точке с запятой
-    const inputs = message.text.split(';').map((item) => item.trim());
-  
-    // Проверяем, что введено достаточно данных
-    if (inputs.length < 6) {
-      await ctx.reply('Вы ввели недостаточно данных. Пожалуйста, попробуйте снова.');
-      return;
-    }
-  
-    // Добавляем заглушку для фотографии (так как её нельзя ввести текстом)
-    inputs.push('Фотография запчасти (отправьте отдельно)');
-  
-    // Генерируем таблицу
-    const table = generateTable(inputs);
-  
-    // Отправляем таблицу
-    await ctx.reply(table, { parse_mode: "HTML" });
-  
-    // Сохраняем данные в массив (в дальнейшем можно отправить в CRM)
-    const data = {
-      brand: inputs[0],
-      model: inputs[1],
-      year: inputs[2],
-      vin: inputs[3],
-      part: inputs[4],
-      note: inputs[5]
-    };
-  
-    // Возвращаем данные в чат в виде текстового сообщения
-    await ctx.reply('Супер! Я передал Ваши данные менеджеру. Совсем скоро менеджер свяжется с Вами!');
-  });
-//
+
+bot.hears('Автозапчасти Дубай', async (ctx) => {
+    await ctx.reply('Вот контакт нашего менеджера по приобретению и доставке автозапчастей из Дубая.');
+});
+
 bot.hears('Заказы с POIZON', async (ctx) => {
     ctx.session.waitingForPrice = true;
     await ctx.reply('Укажите стоимость товара в юанях (¥), чтобы я рассчитал примерную стоимость в USD.');
