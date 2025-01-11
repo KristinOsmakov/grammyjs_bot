@@ -62,31 +62,43 @@ bot.hears('Автозапчасти Китай', async (ctx) => {
 
     ctx.session.waitingForCarData = true;
 
-bot.on('message:text', async (ctx) => {
-    if (ctx.session.waitingForCarData) {
-        // Получаем введенные данные
-        const userInput = ctx.message.text;
-
-        // Отправляем сообщение с принятыми данными
-        await ctx.reply(`Данные приняты:\n${userInput}`);
-
-        // Сбрасываем флаг ожидания
-        ctx.session.waitingForCarData = false;
-    }
-});
-
-bot.launch();
-
 bot.hears('Заказы с POIZON', async (ctx) => {
     ctx.session.waitingForPrice = true;
     await ctx.reply('Укажите стоимость товара в юанях (¥), чтобы я рассчитал примерную стоимость в USD.');
 });
 
 // Получение сообщения со стоимостью товара
-bot.on('message:text', async (ctx) => {
-    if (ctx.session.waitingForPrice) {
-        const price = parseFloat(ctx.message.text);
+// bot.on('message:text', async (ctx) => {
+//     if (ctx.session.waitingForPrice) {
+//         const price = parseFloat(ctx.message.text);
 
+//         if (!isNaN(price)) {
+//             let result = price / 7;
+//             if (result < 100) {
+//                 result = result + 10;
+//             } else if (result > 100 && result < 1000) {
+//                 result = result * 1.1;
+//             } else if (result >= 1000) {
+//                 result = result * 1.05;
+//             }
+//             await ctx.reply(`Ориентировочная стоимость товара c учетом доставки в USD: ${result.toFixed(2)}`);
+//         } else {
+//             await ctx.reply('Пожалуйста, введите стоимость в юанях (¥) (числовое значение)');
+//         }
+
+//         // // Сбрасываем состояние ожидания в любом случае
+//         // ctx.session.waitingForPrice = false;
+//     }
+// });
+bot.on('message:text', async (ctx) => {
+    if (ctx.session.waitingForCarData) {
+        // Обработка данных об автомобиле
+        const userInput = ctx.message.text;
+        await ctx.reply(`Данные приняты:\n${userInput}`);
+        ctx.session.waitingForCarData = false; // Сбрасываем флаг
+    } else if (ctx.session.waitingForPrice) {
+        // Обработка стоимости товара
+        const price = parseFloat(ctx.message.text);
         if (!isNaN(price)) {
             let result = price / 7;
             if (result < 100) {
@@ -100,9 +112,7 @@ bot.on('message:text', async (ctx) => {
         } else {
             await ctx.reply('Пожалуйста, введите стоимость в юанях (¥) (числовое значение)');
         }
-
-        // // Сбрасываем состояние ожидания в любом случае
-        // ctx.session.waitingForPrice = false;
+        ctx.session.waitingForPrice = false; // Сбрасываем флаг
     }
 });
 
