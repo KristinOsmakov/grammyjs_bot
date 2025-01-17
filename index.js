@@ -22,7 +22,7 @@ bot.command('help', async (ctx) => {
 // Команда /services
 bot.command('services', async (ctx) => {
     const moodKeyboard2 = new Keyboard()
-        .text('Автозапчасти')
+        // .text('Автозапчасти')
         .row()
         .text('Заказы с POIZON')
         .resized();
