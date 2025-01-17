@@ -9,8 +9,12 @@ bot.use(session({ initial: () => ({ waitingForPrice: false, waitingForCarData: f
 
 // Команда /start
 bot.command('start', async (ctx) => {
+    const servicesKeyboard = new Keyboard()
+        .text('Заказы с POIZON')
+        .resized();
     await ctx.reply(
-        'Привет! Я бот ТоварБел. Давай я помогу тебе рассчитать примерную стоимость товара в Китае в USD. Напиши стоимость товара в юанях (¥). Если тебя все устроит, кидай ссылку на товар мне и я закажу тебе его.'
+        'Привет! Я бот ТоварБел. Давай я помогу тебе рассчитать примерную стоимость товара в Китае в USD. Напиши стоимость товара в юанях (¥). Если тебя все устроит, кидай ссылку на товар мне и я закажу тебе его.',
+        { reply_markup: servicesKeyboard }
     );
 });
 
@@ -149,7 +153,7 @@ VIN - номер: ${vin}
         } else {
             await ctx.reply('Пожалуйста, введите стоимость в юанях (¥) (числовое значение)');
         }
-        ctx.session.waitingForPrice = false; // Сбрасываем флаг
+        // ctx.session.waitingForPrice = false; // Сбрасываем флаг
     }
 });
 
