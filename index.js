@@ -12,6 +12,8 @@ bot.command('start', async (ctx) => {
     const userName = ctx.from.first_name
     const servicesKeyboard = new Keyboard()
         .text('Заказы обуви с POIZON')
+        .row()
+        .text('Заказы товаров с POIZON (все, кроме обуви)')
         .resized();
     await ctx.reply(
         `Привет, ${userName}! Я бот ТоварБел.\n\nДавай я помогу тебе рассчитать примерную стоимость товара в Китае в USD.\n
@@ -54,7 +56,7 @@ bot.on('message:text', async (ctx) => {
     if (ctx.session.waitingForOtherPrice) {
         // Обработка стоимости обуви
         const price = parseFloat(ctx.message.text);
-        if (!isNaN(price)) {
+        if (!isNaN(price) && price > 0) {
             let result = price / 7;
             if (result < 100) {
                 result = result + 10;
@@ -76,7 +78,7 @@ bot.on('message:text', async (ctx) => {
     } else if (ctx.session.waitingForPrice) {
         // Обработка стоимости обуви
         const price = parseFloat(ctx.message.text);
-        if (!isNaN(price)) {
+        if (!isNaN(price) && price > 0) {
             let result = price / 7;
             if (result < 100) {
                 result = result + 10 + 15;
