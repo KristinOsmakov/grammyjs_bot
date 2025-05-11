@@ -49,11 +49,6 @@ bot.hears('Заказы обуви с POIZON', async (ctx) => {
     await ctx.reply('Укажите стоимость пары обуви в юанях (¥), чтобы я рассчитал стоимость в USD с учетом доставки в Минск.');
 });
 
-// bot.hears('Заказы товаров с POIZON (все, кроме обуви)', async (ctx) => {
-//     ctx.session.waitingForOtherPrice = true; // Устанавливаем флаг ожидания цены
-//     await ctx.reply('Укажите стоимость товара в юанях (¥), чтобы я рассчитал стоимость в USD без учета доставки в Минск.');
-// });
-
 // Обработка кнопки "Заказы товаров с POIZON (все, кроме обуви)"
 bot.hears('Заказы товаров с POIZON (все, кроме обуви)', async (ctx) => {
     ctx.session.waitingForWeight = true;
@@ -84,11 +79,6 @@ bot.on('message:text', async (ctx) => {
         if (!isNaN(price) && price > 0) {
             let result = price / 7;
             
-            // Добавляем стоимость доставки по весу (6 USD за кг)
-            if (ctx.session.currentWeight) {
-                result += ctx.session.currentWeight * 6;
-            }
-            
             // Применяем процентные надбавки
             if (result < 100) {
                 result = result + 10;
@@ -96,6 +86,17 @@ bot.on('message:text', async (ctx) => {
                 result = result * 1.1;
             } else if (result >= 1000) {
                 result = result * 1.05;
+            }
+
+            // Добавляем стоимость доставки по весу
+            if (ctx.session.currentWeight) {
+                // result += ctx.session.currentWeight * 6;
+                if(ctx.session.currentWeight < 1) {
+                    result += ctx.session.currentWeight + 6.5;
+                }
+                else {
+                    result += ctx.session.currentWeight * 6.5;
+                }
             }
             
             await ctx.reply(`
@@ -118,31 +119,6 @@ bot.on('message:text', async (ctx) => {
             await ctx.reply('Пожалуйста, введите корректную стоимость в юанях (¥) (положительное число):');
         }
     }
-// // Обработка текстовых сообщений
-// bot.on('message:text', async (ctx) => {
-//     if (ctx.session.waitingForOtherPrice) {
-//         // Обработка стоимости обуви
-//         const price = parseFloat(ctx.message.text);
-//         if (!isNaN(price) && price > 0) {
-//             let result = price / 7;
-//             if (result < 100) {
-//                 result = result + 10;
-//             } else if (result > 100 && result < 1000) {
-//                 result = result * 1.1;
-//             } else if (result >= 1000) {
-//                 result = result * 1.05;
-//             }
-//             await ctx.reply(`
-//                 \n
-//                 Стоимость Вашего товара (без учета доставки в Минск): ${result.toFixed(2)}USD.\n\nДля оформления заказа можно обратиться к нашему специалисту - @tovarbel_by\n\nОбращаем Ваше внимание, что стоимость товара может измениться на день оплаты.
-//                 `);
-//         } else {
-//             await ctx.reply('Пожалуйста, введите стоимость в юанях (¥) (числовое значение)');
-//         }
-
-//         // Сбрасываем флаг ожидания
-//         ctx.session.waitingForOtherPrice = false;
-//     } 
     else if (ctx.session.waitingForPrice) {
         // Обработка стоимости обуви
         const price = parseFloat(ctx.message.text);
