@@ -92,7 +92,7 @@ bot.on('message:text', async (ctx) => {
             if (ctx.session.currentWeight) {
                 // result += ctx.session.currentWeight * 6;
                 if(ctx.session.currentWeight < 1) {
-                    result += ctx.session.currentWeight + 6.5;
+                    result += 6.5;
                 }
                 else {
                     result += ctx.session.currentWeight * 6.5;
